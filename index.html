@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="style.css?v=5" />
+<link rel="stylesheet" href="style.css?v=15" />
 
 <!-- Vercel Web Analytics -->
 <script>
@@ -96,7 +96,7 @@
 
   <!-- Three words, alone. The weight comes from what precedes them. -->
   <div class="said-no">
-    <p>I said no.</p>
+    <p>It was snow.</p>
   </div>
 
   <figure class="image-bleed image-bleed--full-height">
@@ -242,6 +242,7 @@
 
 <div class="colophon">
   <p>Ladakh · July 2022</p>
+  <p class="colophon__hint">numbered marks in the text open field notes</p>
 </div>
 
 <!-- Footnote card — single floating panel, content swapped by JS -->
@@ -256,13 +257,13 @@
      ============================================================ -->
 <div class="drawer" id="practical-drawer">
 
+  <div class="drawer__body" id="drawer-body" aria-hidden="true">
+
   <button class="drawer__handle" id="drawer-handle" aria-expanded="false" aria-controls="drawer-body">
     <span class="drawer__handle-pip" aria-hidden="true"></span>
     <span class="drawer__handle-label">practical notes</span>
     <span class="drawer__handle-arrow" aria-hidden="true">↑</span>
   </button>
-
-  <div class="drawer__body" id="drawer-body" aria-hidden="true">
 
     <nav class="drawer__tabs" role="tablist" aria-label="Practical notes">
       <button class="drawer__tab drawer__tab--active" role="tab" data-tab="route"    aria-selected="true">Route</button>
@@ -504,8 +505,8 @@
 
     </div><!-- /.drawer__content -->
   </div><!-- /.drawer__body -->
-</div><!-- /.drawer -->
+  </div><!-- /.drawer -->
 
-<script src="script.js?v=4"></script>
+<script src="script.js?v=13"></script>
 </body>
 </html>

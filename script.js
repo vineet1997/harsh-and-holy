@@ -75,6 +75,25 @@
     revealTargets.forEach(function (el) { el.classList.add('in-view'); });
   }
 
+  // ---------- One-time discovery pulse on the first prose footnote --------
+  // fn3 is the first marker inside actual prose body text — the user is
+  // reading carefully there, the element is full-size, and the section has
+  // a 1.1s fade-in so we wait for that before pulsing.
+  // We observe the parent <p> (normal height) rather than the 1px sup itself.
+  var fnPulseTarget = document.querySelector('.fn[data-fn="3"]');
+  var fnPulseTrigger = fnPulseTarget && fnPulseTarget.closest('p');
+  if (fnPulseTarget && fnPulseTrigger && 'IntersectionObserver' in window) {
+    var fnPulseIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          setTimeout(function () { fnPulseTarget.classList.add('fn--pulse'); }, 1200);
+          fnPulseIO.unobserve(fnPulseTrigger);
+        }
+      });
+    }, { threshold: 0.5 });
+    fnPulseIO.observe(fnPulseTrigger);
+  }
+
   // ---------- Trigger star field when stars section enters view -----------
   const starsSection = document.getElementById('stars');
   if (starsSection && 'IntersectionObserver' in window) {
@@ -156,6 +175,26 @@
   var drawerEl     = document.getElementById('practical-drawer');
   var drawerHandle = document.getElementById('drawer-handle');
   var drawerBodyEl = document.getElementById('drawer-body');
+
+  // Show drawer only when the reader reaches the end of the page
+  if (drawerEl) {
+    function updateDrawerReady() {
+      var nearBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 300);
+      if (nearBottom) {
+        drawerEl.classList.add('drawer--ready');
+      } else {
+        drawerEl.classList.remove('drawer--ready');
+        // Collapse if open while scrolling away
+        if (drawerEl.classList.contains('drawer--open')) {
+          drawerEl.classList.remove('drawer--open');
+          if (drawerHandle) drawerHandle.setAttribute('aria-expanded', 'false');
+          if (drawerBodyEl) drawerBodyEl.setAttribute('aria-hidden', 'true');
+        }
+      }
+    }
+    window.addEventListener('scroll', updateDrawerReady, { passive: true });
+    updateDrawerReady();
+  }
 
   if (drawerHandle && drawerEl) {
     drawerHandle.addEventListener('click', function () {

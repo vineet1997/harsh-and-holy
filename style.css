@@ -87,7 +87,7 @@ body::before {
 /* ---------- Progress indicator ------------------------------------------ */
 .progress {
   position: fixed;
-  bottom: calc(44px + 1.4rem);
+  bottom: 1.4rem;
   right: 1.25rem;
   width: 1px;
   height: 5rem;
@@ -647,10 +647,12 @@ body::before {
    SILENCE DIVS — empty space as design. Measured breathing room.
    ========================================================================== */
 
-/* Half-viewport before "I said no." — the held breath */
+/* Half-viewport before "I said no." — the held breath.
+   Bridges from the solid bone of prose--ascent down into the
+   whiteout on which "I said no." sits. */
 .silence--half {
   min-height: 50vh;
-  background: inherit;
+  background: linear-gradient(to bottom, var(--bone) 0%, var(--whiteout) 100%);
 }
 
 /* Between the two rapture images — gap before the gesture repeats */
@@ -780,6 +782,12 @@ body::before {
   color: var(--umber);
   opacity: 0.6;
   margin: 0;
+}
+.colophon__hint {
+  margin-top: 0.9rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  opacity: 0.38;
 }
 
 /* ==========================================================================
@@ -986,11 +994,11 @@ body::before {
    Small numbered markers in prose — tap/click to open info card
    ========================================================================== */
 .fn {
-  display: inline;
+  display: inline-block; /* inline-block so transform works in the pulse */
   font-family: var(--font-display);
   font-style: normal;
   font-weight: 400;
-  font-size: 0.58em;
+  font-size: 0.72em;
   vertical-align: super;
   line-height: 0;
   color: var(--umber);
@@ -1000,6 +1008,21 @@ body::before {
   transition: color 0.15s, border-color 0.15s;
   user-select: none;
   -webkit-user-select: none;
+}
+
+/* One-time discovery pulse on footnote ¹ */
+@keyframes fn-pulse {
+  0%   { color: var(--umber); border-color: rgba(122,93,63,0.45); transform: scale(1);   }
+  35%  { color: var(--ochre); border-color: var(--ochre);          transform: scale(1.6); }
+  65%  { color: var(--ochre); border-color: var(--ochre);          transform: scale(1.6); }
+  100% { color: var(--umber); border-color: rgba(122,93,63,0.45); transform: scale(1);   }
+}
+.fn--pulse {
+  animation-name: fn-pulse;
+  animation-duration: 1.8s;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
 }
 .fn:hover,
 .fn:focus {
@@ -1112,7 +1135,7 @@ body::before {
   z-index: 250;
 }
 
-/* Handle — always visible */
+/* Handle — top of the sliding sheet */
 .drawer__handle {
   display: flex;
   align-items: center;
@@ -1154,22 +1177,30 @@ body::before {
 }
 .drawer--open .drawer__handle-arrow { transform: rotate(180deg); }
 
-/* Body — absolutely positioned, slides up */
+/* Body — handle + content travel as one sheet.
+   position: absolute takes it out of flow so .drawer collapses to
+   zero height and never blocks clicks on the page behind it. */
 .drawer__body {
   position: absolute;
-  bottom: 44px;
+  bottom: 0;
   left: 0;
   right: 0;
-  height: 62vh;
+  height: calc(62vh + 44px);
   background: var(--bone-cool);
-  border-top: 1px solid rgba(42, 36, 29, 0.1);
   box-shadow: 0 -8px 40px rgba(26, 24, 20, 0.12);
-  transform: translateY(105%);
+  transform: translateY(100%);
   transition: transform 0.45s var(--ease-in-out-slow);
   display: flex;
   flex-direction: column;
 }
-.drawer--open .drawer__body { transform: translateY(0); }
+/* near page-end: only the handle peeks above the bottom */
+.drawer--ready .drawer__body {
+  transform: translateY(calc(100% - 44px));
+}
+/* fully open: entire sheet slides up */
+.drawer--open .drawer__body {
+  transform: translateY(0);
+}
 
 /* Tab navigation */
 .drawer__tabs {
@@ -1384,7 +1415,7 @@ body::before {
 
 /* Mobile */
 @media (max-width: 720px) {
-  .drawer__body { height: 76vh; }
+  .drawer__body { height: calc(76vh + 44px); }
   .route-layout { grid-template-columns: 1fr; }
   .route-map-wrap { height: 220px; order: -1; }
   .notes-grid { grid-template-columns: 1fr; }
