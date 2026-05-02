@@ -5,3 +5,6 @@
 # But keep the actual project images folder
 !images/
 !images/**
+
+# Keep the OG social preview image
+!og-image.jpg
