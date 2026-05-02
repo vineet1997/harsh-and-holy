@@ -1,0 +1,1395 @@
+/* ==========================================================================
+   HARSH & HOLY — Rebuilt
+   Five movements. No section headers. Silence as a design element.
+   ========================================================================== */
+
+/* ---------- Design tokens ------------------------------------------------ */
+:root {
+  --bone:          #F4EFE6;
+  --bone-deep:     #EBE4D6;
+  --bone-cool:     #EDE9E0;
+  --deep-earth:    #1A1814;
+  --ink:           #2A241D;
+
+  --ochre:         #B8956A;
+  --umber:         #7A5D3F;
+  --stone:         #8B8478;
+  --stone-soft:    #A8A096;
+
+  --pass-blue:     #3A5468;
+  --thin-air:      #6B8CAE;
+  --void:          #0A0E1A;
+  --void-mid:      #151A2E;
+
+  --prayer-red:    #C44536;
+  --whiteout:      #F8F6F1;
+  --whiteout-fade: #E8E4DB;
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Fraunces', 'Palatino', Georgia, serif;
+
+  --t-monument:   clamp(3.5rem, 13vw, 8.5rem);
+  --t-display:    clamp(2.8rem, 8vw, 5.5rem);
+  --t-pull:       clamp(1.35rem, 2.5vw, 1.9rem);
+  --t-body:       1rem;
+  --t-whisper:    0.88rem;
+  --t-mark:       0.74rem;
+
+  --measure:        32rem;
+  --gutter:         clamp(1.5rem, 5vw, 3.5rem);
+  --indent:         clamp(1rem, 8vw, 7rem);
+
+  --ease-smooth:      cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in-out-slow: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ---------- Reset & base ------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bone);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.7;
+  font-weight: 400;
+  font-variation-settings: "opsz" 14, "SOFT" 50;
+  letter-spacing: 0.002em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Grain — keeps digital images from feeling too clean */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.022;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply;
+}
+
+/* ---------- Progress indicator ------------------------------------------ */
+.progress {
+  position: fixed;
+  bottom: calc(44px + 1.4rem);
+  right: 1.25rem;
+  width: 1px;
+  height: 5rem;
+  background-color: rgba(26, 24, 20, 0.12);
+  z-index: 50;
+  pointer-events: none;
+}
+.progress-fill {
+  width: 100%;
+  height: 0%;
+  background-color: var(--deep-earth);
+  transition: height 0.1s linear;
+}
+
+/* ==========================================================================
+   OPENING & CLOSING MONUMENTS
+   Identical visual treatment — the reader recognises the return.
+   ========================================================================== */
+.opening-monument,
+.closing-monument {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 clamp(1.5rem, 8vw, 7rem);
+  background: var(--bone);
+}
+
+.opening-monument p,
+.closing-monument p {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-style: italic;
+  font-size: var(--t-monument);
+  line-height: 0.95;
+  letter-spacing: -0.018em;
+  color: var(--deep-earth);
+  margin: 0;
+  max-width: 9ch;
+}
+
+/* Closing monument fades in — opening is immediate */
+.closing-monument {
+  opacity: 0;
+  transition: opacity 2.5s var(--ease-in-out-slow);
+}
+.closing-monument.in-view {
+  opacity: 1;
+}
+
+/* Scroll hint — thin vertical line that breathes, suggests motion */
+.scroll-hint {
+  position: absolute;
+  bottom: 2.5rem;
+  left: clamp(1.5rem, 8vw, 7rem);
+  width: 1px;
+  height: 2.8rem;
+  background: linear-gradient(to bottom, var(--umber), transparent);
+  opacity: 0;
+  animation: hint-appear 0.8s ease-out 1.8s forwards,
+             hint-pulse 2.4s ease-in-out 2.6s infinite;
+}
+@keyframes hint-appear { to { opacity: 0.35; } }
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.35; transform: scaleY(1); }
+  50%       { opacity: 0.1;  transform: scaleY(0.65); }
+}
+.scroll-hint--hidden { opacity: 0 !important; animation: none !important; }
+
+/* ==========================================================================
+   TITLE CARD
+   Contextualises the opening monument. Smaller, quieter.
+   ========================================================================== */
+.title-card {
+  min-height: 65vh;
+  padding: 0 var(--gutter);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 68rem;
+  margin: 0 auto;
+  background: var(--bone);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(3.8rem, 13vw, 9rem);
+  line-height: 0.88;
+  margin: 0;
+  letter-spacing: -0.015em;
+  color: var(--deep-earth);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2em;
+}
+.wordmark-amp {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--prayer-red);
+  font-size: 0.82em;
+}
+.wordmark-line {
+  display: inline-block;
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: var(--umber);
+  margin: 2rem 0 0;
+  letter-spacing: 0.16em;
+  text-transform: lowercase;
+  opacity: 0.7;
+}
+
+/* ==========================================================================
+   MOVEMENTS — base scaffold
+   ========================================================================== */
+.movement {
+  position: relative;
+  width: 100%;
+}
+
+/* ---------- Movement 1: Arrival ----------------------------------------- */
+.movement--arrival {
+  background: linear-gradient(to bottom, var(--bone) 0%, var(--bone-deep) 100%);
+  --fade-color: var(--bone-deep);
+}
+
+/* ---------- Movement 2: Ascent — bone cools toward whiteout -------------- */
+.movement--ascent {
+  background: linear-gradient(
+    to bottom,
+    var(--bone-deep)     0%,
+    var(--bone-cool)     28%,
+    var(--whiteout-fade) 48%,
+    var(--whiteout)      63%,
+    var(--whiteout)      100%
+  );
+  --fade-color: var(--whiteout);
+}
+/* Mars valley image sits higher in the gradient — use a warmer fade */
+.movement--ascent .image-bleed--hero { --fade-color: var(--bone-cool); }
+/* Snow road image: background is already solid whiteout at this depth */
+.movement--ascent .image-bleed--full-height { --fade-color: var(--whiteout); }
+
+/* ---------- Movement 3: Snow — whiteout (altitude, cold light) ----------- */
+.movement--snow {
+  background: var(--whiteout);
+  --fade-color: var(--whiteout);
+}
+
+/* ---------- Movement 4: Stars — void dark -------------------------------- */
+.movement--stars {
+  background: var(--void);
+  color: var(--bone);
+  overflow: hidden;
+  position: relative;
+  /* Pull up to cover any subpixel gap and gradient tail at the arc boundary */
+  margin-top: -6px;
+  --fade-color: var(--void);
+}
+.movement--stars::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Outer color exactly matches --void so there's no seam at section edge */
+  background: radial-gradient(
+    ellipse at 50% 28%,
+    rgba(30, 40, 80, 0.18) 0%,
+    rgba(10, 14, 26, 1)    70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+.movement--stars > * { position: relative; z-index: 1; }
+
+/* ---------- Movement 5: Return — bone again, warm ----------------------- */
+.movement--return {
+  background: var(--bone);
+  /* Pull up to cover any subpixel gap and gradient tail at the arc boundary */
+  margin-top: -6px;
+  --fade-color: var(--bone);
+}
+
+/* ==========================================================================
+   IMAGE EDGE FADES
+   Images emerge from and dissolve back into the section background.
+   No more hard rectangular edges — each image breathes with the page.
+   ========================================================================== */
+.movement .image-bleed::before,
+.movement .image-bleed::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+/* Top fade — image materialises from the background */
+.movement .image-bleed::before {
+  top: 0;
+  height: 22vh;
+  background: linear-gradient(
+    to bottom,
+    var(--fade-color, var(--bone)) 0%,
+    transparent                   100%
+  );
+}
+/* Bottom fade — image dissolves back into the background */
+.movement .image-bleed::after {
+  bottom: 0;
+  height: 16vh;
+  background: linear-gradient(
+    to top,
+    var(--fade-color, var(--bone)) 0%,
+    transparent                   100%
+  );
+}
+/* Snow road image: needs a taller top fade — sky is a different color
+   temperature from the warm bone above, so we blend over more distance */
+.movement--ascent .image-bleed--full-height::before {
+  height: 36vh;
+}
+
+/* ==========================================================================
+   PALETTE ARCS
+   The darkness arrives slowly — the reader doesn't notice until they're in it.
+   ========================================================================== */
+.palette-arc-dark {
+  min-height: 90vh;
+  background: linear-gradient(
+    to bottom,
+    var(--whiteout)   0%,
+    #D5D1C8           18%,
+    #9C98A0           40%,
+    #4A4860           65%,
+    #1C1A2E           82%,
+    var(--void)       95%,
+    var(--void)       100%
+  );
+}
+
+.palette-arc-light {
+  min-height: 65vh;
+  background: linear-gradient(
+    to bottom,
+    var(--void)   0%,
+    var(--void)   5%,
+    #1C1A2E       18%,
+    #504E60       38%,
+    #908A80       60%,
+    #C8C2B4       80%,
+    var(--bone)   95%,
+    var(--bone)   100%
+  );
+}
+
+/* ==========================================================================
+   EPIGRAPH
+   ========================================================================== */
+.epigraph {
+  max-width: 36rem;
+  margin: 10vh auto 14vh;
+  padding: 0 var(--gutter);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.3rem, 2.4vw, 1.75rem);
+  line-height: 1.55;
+  color: var(--umber);
+  text-align: left;
+}
+.epigraph p {
+  margin: 0 0 0.35em;
+}
+.epigraph-coda {
+  margin-top: 1.1em !important;
+  font-size: 0.84em;
+  color: var(--stone);
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   PROSE BLOCKS — varied by movement
+   ========================================================================== */
+.prose {
+  padding: 4rem var(--gutter);
+}
+.prose p {
+  margin: 0 0 1.4em;
+}
+.prose p:last-child { margin-bottom: 0; }
+
+/* Arrival — warm, generous, full line-height */
+.prose--arrival {
+  max-width: var(--measure);
+  margin-left: var(--indent);
+  margin-right: auto;
+  font-size: clamp(1rem, 1.2vw, 1.07rem);
+  line-height: 1.78;
+  color: var(--ink);
+}
+
+/* Ascent — slightly compressed, altitude is thinning everything */
+.prose--ascent {
+  max-width: 28rem;
+  margin-left: var(--indent);
+  margin-right: auto;
+  font-size: clamp(0.95rem, 1.1vw, 1.02rem);
+  line-height: 1.65;
+  color: #3A342C;
+}
+
+/* Witness — the most important sentence. Plain, not literary. */
+.prose--witness {
+  max-width: 30rem;
+  margin: 0;
+  padding: 5rem var(--gutter) 5rem var(--indent);
+  font-family: var(--font-body);
+  font-style: normal;
+  font-weight: 400;
+  font-size: clamp(1.15rem, 2.3vw, 1.55rem);
+  line-height: 1.6;
+  color: var(--ink);
+}
+.prose--witness p { margin: 0; }
+
+/* Stars — light on dark, slightly heavier for legibility */
+.prose--stars {
+  max-width: 30rem;
+  margin-left: var(--indent);
+  margin-right: auto;
+  font-size: clamp(1rem, 1.2vw, 1.07rem);
+  line-height: 1.78;
+  color: var(--bone);
+  font-weight: 450;
+}
+.prose--stars em {
+  font-style: italic;
+  font-family: var(--font-display);
+  color: var(--stone-soft);
+}
+
+.prose--caveat {
+  padding-top: 2.5rem;
+  padding-bottom: 3rem;
+}
+
+.prose--room {
+  padding-top: 3rem;
+  padding-bottom: 8rem;
+}
+
+/* Return — warm again, full body */
+.prose--return {
+  max-width: var(--measure);
+  margin-left: var(--indent);
+  margin-right: auto;
+  font-size: clamp(1rem, 1.2vw, 1.07rem);
+  line-height: 1.78;
+  color: var(--ink);
+}
+
+/* ==========================================================================
+   WHISPER — caveat text in the stars section
+   ========================================================================== */
+.whisper-light {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.8;
+  color: var(--stone-soft);
+  letter-spacing: 0.01em;
+}
+
+/* ==========================================================================
+   PULL QUOTES
+   ========================================================================== */
+.pull-quote {
+  max-width: 34rem;
+  padding: 8vh var(--gutter);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--t-pull);
+  line-height: 1.38;
+  color: var(--umber);
+  letter-spacing: 0.005em;
+}
+.pull-quote p { margin: 0; }
+
+/* Ascent pull quote — left margin, first beat of the movement */
+.pull-quote--ascent {
+  margin-left: var(--indent);
+  margin-right: auto;
+  padding-top: 10vh;
+  padding-bottom: 6vh;
+  color: var(--stone);
+  font-size: clamp(1.2rem, 2.2vw, 1.7rem);
+}
+
+/* Holiness — the second half, centered, cool blue tinge */
+.pull-quote--holiness {
+  margin: 0 auto;
+  padding-top: 0;
+  padding-bottom: 8vh;
+  text-align: center;
+  color: var(--pass-blue);
+  max-width: 28rem;
+  font-size: clamp(1.2rem, 2.2vw, 1.7rem);
+}
+
+/* River — first line of the return movement */
+.pull-quote--river {
+  margin-left: var(--indent);
+  margin-right: auto;
+  padding-top: 10vh;
+  padding-bottom: 6vh;
+  color: var(--umber);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+}
+
+/* ==========================================================================
+   HERALD — "And then they stepped out."
+   Announces the rapture. High top padding, centered, pass-blue.
+   ========================================================================== */
+.herald {
+  padding: 14vh var(--gutter) 8vh;
+  max-width: 32rem;
+  margin: 0 auto;
+  text-align: center;
+}
+.herald p {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 3.2vw, 2.6rem);
+  line-height: 1.3;
+  color: var(--pass-blue);
+  margin: 0;
+  letter-spacing: 0.006em;
+}
+
+/* ==========================================================================
+   SAID-NO — "I said no."
+   The weighted moment. Arrives from silence. No upward motion.
+   ========================================================================== */
+.said-no {
+  padding: 0 var(--gutter) 6vh;
+  padding-left: var(--indent);
+}
+.said-no p {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(3.8rem, 14vw, 9rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--deep-earth);
+  margin: 0;
+}
+
+/* ==========================================================================
+   MONUMENT — "I woke them at two."
+   ========================================================================== */
+.monument {
+  min-height: 88vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 clamp(1.5rem, 8vw, 7rem);
+}
+.monument p {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-style: italic;
+  font-size: var(--t-monument);
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+  color: var(--deep-earth);
+  margin: 0;
+  max-width: 9ch;
+}
+.monument--dark p { color: var(--bone); }
+
+/* ==========================================================================
+   IMAGES
+   ========================================================================== */
+
+/* Base bleed — edge to edge, no gutters */
+.image-bleed {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
+}
+.image-bleed img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* Arrival — portrait, allows full height */
+.image-bleed--arrival img {
+  max-height: 92vh;
+  min-height: 70vh;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Hero — landscape, constrained height */
+.image-bleed--hero img {
+  max-height: 92vh;
+  min-height: 72vh;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Full-height — used for the snow road image */
+.image-bleed--full-height img {
+  min-height: 88vh;
+  max-height: 100vh;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Rapture — fills the entire viewport. These images demand full attention. */
+.image-bleed--rapture img {
+  min-height: 100vh;
+  max-height: 100vh;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* Milky Way — full bleed, portrait image fills screen in dark section */
+.image-bleed--milky {
+  /* Inherits the void background — dark image blends into dark section */
+}
+.image-bleed--milky img {
+  min-height: 90vh;
+  max-height: 96vh;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* ==========================================================================
+   SILENCE DIVS — empty space as design. Measured breathing room.
+   ========================================================================== */
+
+/* Half-viewport before "I said no." — the held breath */
+.silence--half {
+  min-height: 50vh;
+  background: inherit;
+}
+
+/* Between the two rapture images — gap before the gesture repeats */
+.silence--whiteout {
+  min-height: 32vh;
+  background: var(--whiteout);
+}
+
+/* Short pause after second rapture, before witness prose */
+.silence--bone-short {
+  min-height: 22vh;
+  background: var(--whiteout);
+}
+
+/* Full-viewport after "I think she was thanking it." */
+.silence--full {
+  min-height: 38vh;
+  background: var(--whiteout);
+}
+
+/* Void silence — floating in the dark after the star list */
+.silence--void {
+  min-height: 70vh;
+  background: var(--void);
+}
+
+/* Long silence at end of return movement, before closing monument */
+.silence--long {
+  min-height: 55vh;
+  background: var(--bone);
+}
+
+/* ==========================================================================
+   STAR LIST
+   One per line — the naming of things in the dark.
+   ========================================================================== */
+.star-list {
+  list-style: none;
+  margin: 5vh 0;
+  padding: 0;
+  padding-left: var(--indent);
+}
+.star-tag {
+  display: block;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+  color: var(--thin-air);
+  line-height: 2.3;
+  letter-spacing: 0.015em;
+}
+
+/* CSS star field */
+.stars-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    radial-gradient(1px 1px at 17% 12%, rgba(255,255,255,0.8),  transparent),
+    radial-gradient(1px 1px at 43% 28%, rgba(255,255,255,0.55), transparent),
+    radial-gradient(1px 1px at 71%  8%, rgba(255,255,255,0.9),  transparent),
+    radial-gradient(1px 1px at 82% 55%, rgba(255,255,255,0.65), transparent),
+    radial-gradient(1px 1px at 29% 71%, rgba(255,255,255,0.5),  transparent),
+    radial-gradient(1px 1px at 55% 41%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(1px 1px at  9% 48%, rgba(255,255,255,0.6),  transparent),
+    radial-gradient(1px 1px at 38%  7%, rgba(255,255,255,0.7),  transparent),
+    radial-gradient(1px 1px at 64% 80%, rgba(255,255,255,0.5),  transparent),
+    radial-gradient(1px 1px at 91% 32%, rgba(255,255,255,0.75), transparent),
+    radial-gradient(2px 2px at 23% 58%, rgba(255,255,255,0.95), transparent),
+    radial-gradient(1.5px 1.5px at 77% 22%, rgba(255,255,255,0.85), transparent),
+    radial-gradient(1px 1px at 6%  88%, rgba(255,255,255,0.5),  transparent),
+    radial-gradient(1px 1px at 50% 65%, rgba(255,255,255,0.4),  transparent),
+    radial-gradient(1px 1px at 88% 77%, rgba(255,255,255,0.6),  transparent);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  animation: stars-fade 3.5s var(--ease-smooth) forwards;
+  animation-play-state: paused;
+}
+.movement--stars.in-view .stars-field {
+  animation-play-state: running;
+}
+@keyframes stars-fade { to { opacity: 0.55; } }
+
+/* ==========================================================================
+   SONG MOMENT
+   ========================================================================== */
+.song-moment {
+  max-width: 40rem;
+  margin: 10vh auto;
+  padding: 0 var(--gutter);
+  text-align: center;
+}
+.song-line {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  line-height: 1.15;
+  color: var(--pass-blue);
+  margin: 0 0 0.4em;
+  letter-spacing: -0.005em;
+}
+.song-gloss {
+  font-family: var(--font-body);
+  font-size: var(--t-mark);
+  color: var(--umber);
+  opacity: 0.7;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+/* ==========================================================================
+   COLOPHON
+   ========================================================================== */
+.colophon {
+  background: var(--bone);
+  padding: 0 var(--gutter) 8vh;
+  text-align: center;
+}
+.colophon p {
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  letter-spacing: 0.2em;
+  text-transform: lowercase;
+  color: var(--umber);
+  opacity: 0.6;
+  margin: 0;
+}
+
+/* ==========================================================================
+   SCROLL-TRIGGERED REVEALS
+   Elements rise 20px and fade in. Exceptions noted.
+   ========================================================================== */
+.epigraph,
+.image-bleed,
+.prose--arrival,
+.prose--ascent,
+.prose--witness,
+.prose--stars,
+.prose--return,
+.pull-quote,
+.herald,
+.song-moment,
+.star-list,
+.whisper-light {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1.1s var(--ease-in-out-slow),
+              transform 1.1s var(--ease-in-out-slow);
+}
+
+/* said-no: no upward motion — just arrives from stillness */
+.said-no {
+  opacity: 0;
+  transition: opacity 2s var(--ease-in-out-slow);
+}
+
+/* Monument: fade only, no motion */
+.monument {
+  opacity: 0;
+  transition: opacity 1.8s var(--ease-in-out-slow);
+}
+
+/* in-view states */
+.epigraph.in-view,
+.image-bleed.in-view,
+.prose--arrival.in-view,
+.prose--ascent.in-view,
+.prose--witness.in-view,
+.prose--stars.in-view,
+.prose--return.in-view,
+.pull-quote.in-view,
+.herald.in-view,
+.song-moment.in-view,
+.star-list.in-view,
+.whisper-light.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.said-no.in-view,
+.monument.in-view {
+  opacity: 1;
+}
+
+/* Title card and opening monument — visible immediately, no reveal */
+.title-card,
+.title-card *,
+.opening-monument p,
+.scroll-hint {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+/* Exception: scroll-hint has its own animation */
+.scroll-hint {
+  opacity: 0 !important;
+  animation: hint-appear 0.8s ease-out 1.8s forwards,
+             hint-pulse 2.4s ease-in-out 2.6s infinite !important;
+}
+
+/* ==========================================================================
+   RESPONSIVE — 720px and below
+   ========================================================================== */
+@media (max-width: 720px) {
+  body { font-size: 16px; }
+
+  .progress { display: none; }
+
+  .prose--arrival,
+  .prose--ascent,
+  .prose--return {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 3rem var(--gutter);
+  }
+
+  .prose--witness {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+
+  .prose--stars {
+    margin-left: 0;
+    padding: 3rem var(--gutter);
+  }
+
+  .pull-quote--ascent,
+  .pull-quote--river {
+    margin-left: 0;
+    padding-left: var(--gutter);
+  }
+
+  .said-no {
+    padding-left: var(--gutter);
+  }
+
+  .monument {
+    padding: 0 var(--gutter);
+    min-height: 75vh;
+  }
+
+  .epigraph {
+    margin-top: 8vh;
+    margin-bottom: 10vh;
+  }
+
+  .star-list {
+    padding-left: var(--gutter);
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE — 480px and below (phone-first grammar)
+   ========================================================================== */
+@media (max-width: 480px) {
+
+  /* Opening/closing monuments scale to fill the narrow viewport */
+  .opening-monument p,
+  .closing-monument p {
+    font-size: clamp(3.2rem, 15vw, 5rem);
+    max-width: 8ch;
+  }
+
+  .monument p {
+    font-size: clamp(3rem, 14vw, 5rem);
+  }
+
+  /* said-no fills more of the screen */
+  .said-no p {
+    font-size: clamp(3.5rem, 15vw, 6rem);
+  }
+
+  /* Rapture images fill the full screen — nothing else */
+  .image-bleed--rapture img {
+    object-position: center center;
+  }
+
+  /* Milky Way — full bleed, no side gaps on phone */
+  .image-bleed--milky img {
+    min-height: 85vh;
+    object-fit: cover;
+  }
+
+  /* Herald has more top breathing room on phone */
+  .herald {
+    padding-top: 12vh;
+    padding-bottom: 6vh;
+  }
+
+  /* Song line scales down gracefully */
+  .song-line {
+    font-size: clamp(2rem, 12vw, 3rem);
+  }
+
+  /* Pull-quote holiness — tighter on phone */
+  .pull-quote--holiness {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+
+  /* Shorter silence on phone — same emotional beat, less scroll */
+  .silence--full  { min-height: 30vh; }
+  .silence--void  { min-height: 55vh; }
+  .silence--long  { min-height: 40vh; }
+  .silence--half  { min-height: 40vh; }
+}
+
+/* ==========================================================================
+   REDUCED MOTION
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .epigraph, .image-bleed, .prose--arrival, .prose--ascent,
+  .prose--witness, .prose--stars, .prose--return, .pull-quote,
+  .herald, .song-moment, .star-list, .said-no, .monument,
+  .closing-monument {
+    opacity: 1;
+    transform: none;
+  }
+  .stars-field { opacity: 0.55 !important; }
+  .scroll-hint { display: none; }
+}
+
+/* ==========================================================================
+   FOOTNOTE SUPERSCRIPTS
+   Small numbered markers in prose — tap/click to open info card
+   ========================================================================== */
+.fn {
+  display: inline;
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.58em;
+  vertical-align: super;
+  line-height: 0;
+  color: var(--umber);
+  cursor: pointer;
+  border-bottom: 1px solid rgba(122, 93, 63, 0.45);
+  padding: 0 0.08em;
+  transition: color 0.15s, border-color 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.fn:hover,
+.fn:focus {
+  color: var(--ochre);
+  border-color: var(--ochre);
+  outline: none;
+}
+.fn--active {
+  color: var(--ochre);
+  border-color: var(--ochre);
+}
+/* In dark stars section, lighten the markers */
+.movement--stars .fn {
+  color: var(--stone-soft);
+  border-color: rgba(168, 160, 150, 0.45);
+}
+.movement--stars .fn:hover,
+.movement--stars .fn:focus,
+.movement--stars .fn--active {
+  color: var(--bone-cool);
+  border-color: var(--bone-cool);
+}
+
+/* ==========================================================================
+   FOOTNOTE CARD
+   Fixed right panel (desktop) — bottom sheet (mobile)
+   ========================================================================== */
+.fn-card {
+  position: fixed;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%) translateX(calc(100% + 3rem));
+  width: clamp(220px, 22vw, 290px);
+  background: var(--bone-cool);
+  border-left: 2px solid var(--umber);
+  padding: 1.3rem 1.5rem 1.3rem 1.4rem;
+  z-index: 300;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.32s var(--ease-smooth),
+              opacity 0.32s var(--ease-smooth);
+  box-shadow: -4px 0 24px rgba(26, 24, 20, 0.07);
+}
+.fn-card.fn-card--open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) translateX(0);
+}
+.fn-card__label {
+  font-family: var(--font-body);
+  font-size: 0.67rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--umber);
+  margin: 0 1.5rem 0.65rem 0;
+  font-weight: 400;
+  font-variation-settings: "opsz" 9;
+}
+.fn-card__body {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  line-height: 1.68;
+  color: var(--ink);
+  margin: 0;
+  font-weight: 400;
+}
+.fn-card__close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--stone);
+  font-size: 1.15rem;
+  line-height: 1;
+  padding: 0.15rem 0.25rem;
+  font-family: var(--font-display);
+  transition: color 0.15s;
+}
+.fn-card__close:hover { color: var(--ink); }
+
+@media (max-width: 720px) {
+  .fn-card {
+    right: 0;
+    left: 0;
+    bottom: 0;
+    top: auto;
+    width: 100%;
+    transform: translateY(100%);
+    border-left: none;
+    border-top: 2px solid var(--umber);
+    padding: 1.4rem 1.6rem 2.5rem;
+    box-shadow: 0 -4px 24px rgba(26, 24, 20, 0.1);
+  }
+  .fn-card.fn-card--open {
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   DRAWER
+   Fixed bottom panel — handle always visible, slides up to reveal 6 tabs
+   ========================================================================== */
+.drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 250;
+}
+
+/* Handle — always visible */
+.drawer__handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  width: 100%;
+  height: 44px;
+  background: var(--bone-deep);
+  border: none;
+  border-top: 1px solid rgba(42, 36, 29, 0.12);
+  padding: 0 1.5rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: lowercase;
+  color: var(--stone);
+  transition: background 0.2s, color 0.2s;
+  position: relative;
+  z-index: 1;
+}
+.drawer__handle:hover { background: var(--bone-cool); color: var(--ink); }
+
+.drawer__handle-pip {
+  display: block;
+  width: 2rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.45;
+  flex-shrink: 0;
+}
+.drawer__handle-label { flex-shrink: 0; }
+.drawer__handle-arrow {
+  font-size: 0.75rem;
+  line-height: 1;
+  display: block;
+  opacity: 0.65;
+  transition: transform 0.35s var(--ease-smooth);
+}
+.drawer--open .drawer__handle-arrow { transform: rotate(180deg); }
+
+/* Body — absolutely positioned, slides up */
+.drawer__body {
+  position: absolute;
+  bottom: 44px;
+  left: 0;
+  right: 0;
+  height: 62vh;
+  background: var(--bone-cool);
+  border-top: 1px solid rgba(42, 36, 29, 0.1);
+  box-shadow: 0 -8px 40px rgba(26, 24, 20, 0.12);
+  transform: translateY(105%);
+  transition: transform 0.45s var(--ease-in-out-slow);
+  display: flex;
+  flex-direction: column;
+}
+.drawer--open .drawer__body { transform: translateY(0); }
+
+/* Tab navigation */
+.drawer__tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(42, 36, 29, 0.1);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex-shrink: 0;
+  background: var(--bone-cool);
+  padding: 0 var(--gutter);
+}
+.drawer__tabs::-webkit-scrollbar { display: none; }
+
+.drawer__tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.88rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--stone);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.drawer__tab:hover { color: var(--ink); }
+.drawer__tab--active { color: var(--ink); border-bottom-color: var(--umber); }
+
+/* Scrollable panels area */
+.drawer__content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.drawer__panel {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: none;
+}
+.drawer__panel--active {
+  display: block;
+}
+
+.panel-inner {
+  padding: 1.8rem var(--gutter) 3.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+/* Route: timeline + map side-by-side */
+.route-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.route-list {
+  list-style: none;
+  padding: 0 0 0 1.5rem;
+  margin: 0;
+  border-left: 1px solid rgba(122, 93, 63, 0.22);
+}
+.route-item {
+  position: relative;
+  padding: 0.5rem 0 0.5rem 1rem;
+}
+.route-item::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--umber);
+  border: 1.5px solid var(--bone-cool);
+}
+.route-item--air::before   { background: var(--stone-soft); }
+.route-item--caution::before { background: var(--prayer-red); }
+
+.route-item__place {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--ink);
+  margin-bottom: 0.1rem;
+}
+.route-item--air .route-item__place::before { content: '✈  '; font-size: 0.7em; opacity: 0.6; }
+.route-item__note {
+  display: block;
+  font-size: 0.76rem;
+  color: var(--stone);
+  line-height: 1.5;
+}
+
+.route-map-wrap {
+  height: 320px;
+  border: 1px solid rgba(42, 36, 29, 0.1);
+  overflow: hidden;
+}
+.route-map-wrap iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.route-gmaps-link {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  letter-spacing: 0.05em;
+  color: var(--pass-blue);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(58, 84, 104, 0.35);
+  padding-bottom: 0.1rem;
+  transition: color 0.15s, border-color 0.15s;
+}
+.route-gmaps-link:hover { color: var(--thin-air); border-color: var(--thin-air); }
+
+/* Notes grid — weather, altitude, food, gifts */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1.5rem 2.5rem;
+}
+
+.note-block__title {
+  font-family: var(--font-body);
+  font-size: 0.67rem;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: var(--umber);
+  margin: 0 0 0.55rem;
+  font-variation-settings: "opsz" 9;
+}
+.note-block--warning .note-block__title { color: var(--prayer-red); }
+
+.note-block p {
+  font-family: var(--font-body);
+  font-size: 0.83rem;
+  line-height: 1.72;
+  color: var(--ink);
+  margin: 0 0 0.4rem;
+}
+.note-caveat {
+  font-size: 0.76rem !important;
+  color: var(--stone) !important;
+  font-style: italic;
+}
+
+.note-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.note-list li {
+  font-family: var(--font-body);
+  font-size: 0.83rem;
+  line-height: 1.65;
+  color: var(--ink);
+  padding: 0.22rem 0;
+  border-bottom: 1px solid rgba(42, 36, 29, 0.06);
+}
+.note-list li:last-child { border-bottom: none; }
+.note-list b { font-weight: 500; }
+
+.note-figure {
+  font-family: var(--font-display) !important;
+  font-size: 1.1rem !important;
+  font-weight: 300 !important;
+  color: var(--deep-earth) !important;
+  letter-spacing: -0.01em !important;
+  margin-top: 0.4rem !important;
+}
+
+/* Budget hero */
+.budget-hero {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(42, 36, 29, 0.1);
+}
+.budget-figure {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5vw, 3.5rem);
+  font-weight: 300;
+  color: var(--deep-earth);
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.budget-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  color: var(--stone);
+  text-transform: lowercase;
+  margin: 0.3rem 0 0;
+}
+
+/* Mobile */
+@media (max-width: 720px) {
+  .drawer__body { height: 76vh; }
+  .route-layout { grid-template-columns: 1fr; }
+  .route-map-wrap { height: 220px; order: -1; }
+  .notes-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .drawer__tab { padding: 0.78rem 0.65rem; font-size: 0.65rem; }
+  .panel-inner { padding: 1.4rem var(--gutter) 2.5rem; }
+}

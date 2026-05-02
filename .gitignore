@@ -1,0 +1,7 @@
+# Test / review screenshots taken during development
+*.png
+*.jpg
+
+# But keep the actual project images folder
+!images/
+!images/**
